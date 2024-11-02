@@ -4,49 +4,46 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_logs_in_a_user_with_correct_credentials()
+    public function test_user_can_login_with_valid_credentials()
     {
         $user = User::factory()->create([
-            'email' => 'akhilesh@example.com',
-            'password' => Hash::make('password123'),
+            'password' => bcrypt('password123'),
         ]);
 
         $response = $this->postJson('/api/login', [
-            'email' => 'akhilesh@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['access_token', 'token_type']);
+            ->assertJsonStructure([
+                'message',
+                'token',
+            ]);
     }
 
-    /** @test */
-    public function it_fails_to_login_with_invalid_credentials()
+    public function test_user_cannot_login_with_invalid_credentials()
     {
-        $user = User::factory()->create([
-            'email' => 'akhilesh@example.com',
-            'password' => Hash::make('password123'),
-        ]);
+        $user = User::factory()->create();
 
         $response = $this->postJson('/api/login', [
-            'email' => 'akhilesh@example.com',
+            'email' => $user->email,
             'password' => 'wrongpassword',
         ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Invalid credentials'
+            ]);
     }
 
-    /** @test */
-    public function it_requires_email_and_password_for_login()
+    public function test_login_validates_required_fields()
     {
         $response = $this->postJson('/api/login', []);
 
