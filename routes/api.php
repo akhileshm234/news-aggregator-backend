@@ -24,9 +24,11 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
     Route::get('/articles', [ArticleController::class, 'index']);
     Route::get('/articles/{article}', [ArticleController::class, 'show']);
     Route::get('/feed', [ArticleController::class, 'personalizedFeed']);
+    Route::get('/articles/personalized', [ArticleController::class, 'personalized']);
     
     Route::apiResource('preferences', UserPreferenceController::class)
         ->only(['index', 'store', 'update']);

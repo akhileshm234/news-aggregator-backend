@@ -10,17 +10,14 @@ use Illuminate\Routing\Controller as BaseController;
  * @OA\Info(
  *     version="1.0.0",
  *     title="News Aggregator API",
- *     description="API Documentation for News Aggregator",
- *     @OA\Contact(
- *         email="akhileshm234@gmail.com"
- *     )
+ *     description="News Aggregator API Documentation"
  * )
  *
  * @OA\SecurityScheme(
+ *     securityScheme="sanctum",
  *     type="http",
  *     scheme="bearer",
- *     bearerFormat="JWT",
- *     securityScheme="bearerAuth"
+ *     bearerFormat="JWT"
  * )
  */
 class Controller extends BaseController

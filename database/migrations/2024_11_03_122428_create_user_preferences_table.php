@@ -13,7 +13,7 @@ class CreateUserPreferencesTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->json('preferred_sources')->nullable();
             $table->json('preferred_categories')->nullable();
-            $table->boolean('email_notifications')->default(false);
+            $table->json('preferred_authors')->nullable();
             $table->timestamps();
         });
     }

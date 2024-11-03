@@ -80,7 +80,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Successfully registered',
             'token' => $token
-        ], 201);
+        ]);
     }
 
     /**
@@ -95,27 +95,41 @@ class AuthController extends Controller
      *     path="/api/login",
      *     tags={"Auth"},
      *     summary="Login user",
+     *     operationId="login",
      *     @OA\RequestBody(
      *         required=true,
+     *         description="User credentials",
      *         @OA\JsonContent(
-     *             @OA\Property(property="email", type="string", example="akhileshm@example.com"),
-     *             @OA\Property(property="password", type="string", example="password123")
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="akhileshm@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Login successful",
+     *         description="Successfully logged in",
      *         @OA\JsonContent(
-     *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."),
-     *             @OA\Property(property="token_type", type="string", example="Bearer")
+     *             @OA\Property(property="message", type="string", example="Successfully logged in"),
+     *             @OA\Property(property="token", type="string", example="1|laravel_sanctum_token...")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Invalid credentials")
      *         )
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Invalid credentials",
+     *         description="Validation errors",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Invalid credentials"),
-     *             @OA\Property(property="errors", type="object")
+     *             @OA\Property(property="message", type="string", example="The given data was invalid"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 example={"email": {"The email field is required"}}
+     *             )
      *         )
      *     )
      * )
@@ -135,7 +149,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Successfully logged in',
             'token' => $token
-        ]);
+        ],200);
     }
 
     /**
@@ -143,14 +157,45 @@ class AuthController extends Controller
      *
      * @param Request $request
      * @return JsonResponse
+     *
+     * @OA\Post(
+     *     path="/api/logout",
+     *     tags={"Auth"},
+     *     summary="Logout user",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully logged out",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Successfully logged out"),
+     *             @OA\Property(property="status", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated"),
+     *             @OA\Property(property="status", type="boolean", example=false)
+     *         )
+     *     )
+     * )
      */
     public function logout(Request $request): JsonResponse
     {
-        $this->authService->logout($request);
-
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
+        try {
+            $this->authService->logout($request);
+            
+            return response()->json([
+                'message' => 'Successfully logged out',
+                'status' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Logout failed',
+                'status' => false
+            ], 500);
+        }
     }
 
     /**

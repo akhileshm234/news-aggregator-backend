@@ -119,9 +119,15 @@
 <script src="{{ l5_swagger_asset($documentation, 'swagger-ui-bundle.js') }}"></script>
 <script src="{{ l5_swagger_asset($documentation, 'swagger-ui-standalone-preset.js') }}"></script>
 <script>
+    function handleLogout() {
+        localStorage.removeItem('bearer');
+        // Clear the authorization
+        window.ui.preauthorizeApiKey("sanctum", null);
+        window.location.reload();
+    }
+
     window.onload = function() {
-        // Build a system
-        const ui = SwaggerUIBundle({
+        window.ui = SwaggerUIBundle({
             dom_id: '#swagger-ui',
             url: "{!! $urlToDocs !!}",
             operationsSorter: {!! isset($operationsSorter) ? '"' . $operationsSorter . '"' : 'null' !!},
@@ -129,10 +135,25 @@
             validatorUrl: {!! isset($validatorUrl) ? '"' . $validatorUrl . '"' : 'null' !!},
             oauth2RedirectUrl: "{{ route('l5-swagger.'.$documentation.'.oauth2_callback', [], $useAbsolutePath) }}",
 
-            requestInterceptor: function(request) {
-                request.headers['X-CSRF-TOKEN'] = '{{ csrf_token() }}';
-                request.headers['Accept'] = 'application/json';
+            requestInterceptor: (request) => {
                 return request;
+            },
+
+            responseInterceptor: (response) => {
+                // Check if this is a logout response
+                if (response.url.endsWith('/api/logout') && response.ok) {
+                    handleLogout();
+                }
+                // Check if this is a login response
+                if (response.url.endsWith('/api/login') && response.ok) {
+                    response.json().then(data => {
+                        if (data.token) {
+                            localStorage.setItem('bearer', 'Bearer ' + data.token);
+                            window.ui.preauthorizeApiKey("sanctum", 'Bearer ' + data.token);
+                        }
+                    });
+                }
+                return response;
             },
 
             presets: [
@@ -145,20 +166,17 @@
             ],
 
             layout: "StandaloneLayout",
-            docExpansion : "{!! config('l5-swagger.defaults.ui.display.doc_expansion', 'none') !!}",
+            docExpansion: "{!! config('l5-swagger.defaults.ui.display.doc_expansion', 'none') !!}",
             deepLinking: true,
             filter: {!! config('l5-swagger.defaults.ui.display.filter') ? 'true' : 'false' !!},
-            persistAuthorization: "{!! config('l5-swagger.defaults.ui.authorization.persist_authorization') ? 'true' : 'false' !!}",
+            persistAuthorization: false
+        });
 
-        })
-
-        window.ui = ui
-
-        @if(in_array('oauth2', array_column(config('l5-swagger.defaults.securityDefinitions.securitySchemes'), 'type')))
-        ui.initOAuth({
-            usePkceWithAuthorizationCodeGrant: "{!! (bool)config('l5-swagger.defaults.ui.authorization.oauth2.use_pkce_with_authorization_code_grant') !!}"
-        })
-        @endif
+        // Initial auth check
+        const token = localStorage.getItem('bearer');
+        if (token) {
+            window.ui.preauthorizeApiKey("sanctum", token);
+        }
     }
 </script>
 </body>

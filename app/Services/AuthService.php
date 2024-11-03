@@ -80,10 +80,13 @@ class AuthService
      */
     public function logout(Request $request): bool
     {
-        if ($request->user() && !$request->user()->currentAccessToken() instanceof \Laravel\Sanctum\TransientToken) {
-            $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        
+        // Check if the token is not transient before attempting to delete
+        if ($user && $user->currentAccessToken() && !($user->currentAccessToken() instanceof \Laravel\Sanctum\TransientToken)) {
+            $user->currentAccessToken()->delete();
         }
-
+        
         return true;
     }
 }
