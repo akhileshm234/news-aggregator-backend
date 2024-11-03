@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\UserPreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,12 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Protected routes
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/articles', [ArticleController::class, 'index']);
+    Route::get('/articles/{article}', [ArticleController::class, 'show']);
+    Route::get('/feed', [ArticleController::class, 'personalizedFeed']);
+    
+    Route::apiResource('preferences', UserPreferenceController::class)
+        ->only(['index', 'store', 'update']);
 });
+

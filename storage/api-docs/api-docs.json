@@ -9,6 +9,28 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/articles": {
+            "get": {
+                "summary": "Get paginated articles",
+                "operationId": "b54354b9d8893e0fd7ca77070deb56b5",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "description": "Search keyword",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
         "/api/register": {
             "post": {
                 "tags": [
@@ -154,79 +176,6 @@
                         }
                     }
                 }
-            }
-        },
-        "/api/logout": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Logout user",
-                "description": "Logs out the currently authenticated user by invalidating their token",
-                "operationId": "logout",
-                "responses": {
-                    "200": {
-                        "description": "Successfully logged out",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Successfully logged out"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated. Token is missing or invalid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated"
-                                        },
-                                        "status_code": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden. Token is blacklisted or expired",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token is invalid or has been blacklisted"
-                                        },
-                                        "status_code": {
-                                            "type": "integer",
-                                            "example": 403
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
             }
         },
         "/api/forgot-password": {
