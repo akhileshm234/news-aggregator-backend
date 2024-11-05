@@ -4,89 +4,66 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 
 class AuthService
 {
-    /**
-     * Register a new user.
-     *
-     * @param  array  $data
-     * @return User
-     */
-    public function register(array $data): User
+    public function login(array $credentials)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
-    }
+        $user = User::where('email', $credentials['email'])->first();
 
-    /**
-     * Login an existing user and return an auth token.
-     *
-     * @param  array  $data
-     * @return string
-     * @throws AuthenticationException
-     */
-    public function login(array $data): string
-    {
-        $user = User::where('email', $data['email'])->first();
-
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            throw new \Exception('The provided credentials are incorrect.', 401);
         }
 
-        return $user->createToken('auth_token')->plainTextToken;
+        return [
+            'user' => $user,
+            'token' => $user->createToken('auth_token')->plainTextToken
+        ];
     }
 
-    public function sendResetLink(array $data): string
+    public function register(array $data)
     {
-        $status = Password::sendResetLink([
-            'email' => $data['email']
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password'])
         ]);
+
+        return [
+            'user' => $user,
+            'token' => $user->createToken('auth_token')->plainTextToken
+        ];
+    }
+
+    public function forgotPassword(string $email)
+    {
+        $status = Password::sendResetLink(['email' => $email]);
 
         if ($status !== Password::RESET_LINK_SENT) {
             throw new \Exception(__($status));
         }
 
-        return $status;
+        return __($status);
     }
 
-    public function resetPassword(array $data): void
+    public function resetPassword(array $data)
     {
-        Password::reset($data, function ($user, $password) {
+        $status = Password::reset($data, function ($user) use ($data) {
             $user->forceFill([
-                'password' => bcrypt($password),
+                'password' => Hash::make($data['password']),
                 'remember_token' => Str::random(60),
             ])->save();
 
             event(new PasswordReset($user));
         });
-    }
 
-    /**
-     * Handle user logout by revoking the current token.
-     *
-     * @param Request $request
-     * @return bool
-     */
-    public function logout(Request $request): bool
-    {
-        $user = $request->user();
-        
-        // Check if the token is not transient before attempting to delete
-        if ($user && $user->currentAccessToken() && !($user->currentAccessToken() instanceof \Laravel\Sanctum\TransientToken)) {
-            $user->currentAccessToken()->delete();
+        if ($status !== Password::PASSWORD_RESET) {
+            throw new \Exception(__($status));
         }
-        
-        return true;
+
+        return __($status);
     }
 }

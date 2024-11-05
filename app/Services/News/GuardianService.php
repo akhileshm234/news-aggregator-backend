@@ -2,43 +2,43 @@
 
 namespace App\Services\News;
 
-use App\Contracts\NewsApiInterface;
+use Carbon\Carbon;
 
-class GuardianService extends BaseNewsService implements NewsApiInterface
+class GuardianService extends BaseNewsService
 {
-    protected function validateConfig(): void
+    public function __construct()
     {
-        $this->apiKey = config('services.guardian.key');
+        parent::__construct();
         $this->baseUrl = 'https://content.guardianapis.com/';
-        
-        if (empty($this->apiKey)) {
-            throw new NewsApiException('Guardian API key not configured');
-        }
+        $this->apiKey = config('services.guardian.api_key');
     }
 
-    public function fetch(array $parameters = []): array
+    public function fetch(): array
     {
-        $defaultParams = [
+        $params = [
+            'api-key' => $this->apiKey,
             'show-fields' => 'all',
+            'page-size' => 10,
+            'order-by' => 'newest'
         ];
 
-        $response = $this->makeRequest('search', array_merge($defaultParams, $parameters));
+        $response = $this->get('search', $params);
         return $response['response']['results'] ?? [];
     }
 
-    public function transform(array $articles): array
+    public function transform($article): array
     {
-        return array_map(function ($article) {
-            return [
-                'source_id' => $article['id'],
-                'source' => 'guardian',
-                'title' => $article['webTitle'],
-                'content' => $article['fields']['bodyText'] ?? '',
-                'url' => $article['webUrl'],
-                'published_at' => $article['webPublicationDate'],
-                'author' => $article['fields']['byline'] ?? null,
-                'image_url' => $article['fields']['thumbnail'] ?? null,
-            ];
-        }, $articles);
+        $publishedAt = Carbon::parse($article['webPublicationDate']);
+
+        return [
+            'title' => $article['webTitle'] ?? '',
+            'content' => $article['fields']['bodyText'] ?? '',
+            'url' => $article['webUrl'] ?? '',
+            'source' => 'guardian',
+            'author' => $article['fields']['byline'] ?? null,
+            'published_at' => $publishedAt,
+            'image_url' => $article['fields']['thumbnail'] ?? null,
+            'category' => $article['sectionName'] ?? $article['section'] ?? null,
+        ];
     }
 } 

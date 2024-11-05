@@ -2,45 +2,48 @@
 
 namespace App\Services\News;
 
-use App\Contracts\NewsApiInterface;
-use App\Exceptions\NewsApiException;
+use Carbon\Carbon;
 
-class NewsApiService extends BaseNewsService implements NewsApiInterface
+class NewsApiService extends BaseNewsService
 {
-    protected function validateConfig(): void
+    public function __construct()
     {
-        $this->apiKey = config('services.newsapi.key');
+        parent::__construct();
         $this->baseUrl = 'https://newsapi.org/v2/';
+        $this->apiKey = config('services.newsapi.api_key');
         
         if (empty($this->apiKey)) {
-            throw new NewsApiException('NewsAPI key not configured');
+            throw new \RuntimeException('NewsAPI API key is not configured');
         }
+        
+        $this->headers['X-Api-Key'] = $this->apiKey;
     }
 
-    public function fetch(array $parameters = []): array
+    public function fetch(): array
     {
-        $defaultParams = [
+        $params = [
             'language' => 'en',
-            'apiKey' => $this->apiKey
+            'pageSize' => 20,
+            'sortBy' => 'publishedAt'
         ];
 
-        $response = $this->makeRequest('top-headlines', array_merge($defaultParams, $parameters));
+        $response = $this->get('top-headlines', $params);
         return $response['articles'] ?? [];
     }
 
-    public function transform(array $articles): array
+    public function transform($article): array
     {
-        return array_map(function ($article) {
-            return [
-                'source_id' => $article['source']['id'] ?? uniqid(),
-                'source' => 'newsapi',
-                'title' => $article['title'],
-                'content' => $article['content'],
-                'url' => $article['url'],
-                'published_at' => $article['publishedAt'],
-                'author' => $article['author'] ?? null,
-                'image_url' => $article['urlToImage'] ?? null,
-            ];
-        }, $articles);
+        $publishedAt = Carbon::parse($article['publishedAt']);
+
+        return [
+            'title' => $article['title'] ?? '',
+            'content' => $article['description'] ?? '',
+            'url' => $article['url'] ?? '',
+            'source' => 'newsapi',
+            'author' => $article['author'] ?? null,
+            'published_at' => $publishedAt,
+            'image_url' => $article['urlToImage'] ?? null,
+            'category' => $article['category'] ?? null,
+        ];
     }
 } 

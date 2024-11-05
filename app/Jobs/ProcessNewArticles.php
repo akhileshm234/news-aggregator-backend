@@ -2,59 +2,53 @@
 
 namespace App\Jobs;
 
+use App\Models\Article;
+use App\Repositories\ArticleRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Repositories\ArticleRepository;
 use Illuminate\Support\Facades\Log;
 
 class ProcessNewArticles implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected array $articles;
-    protected string $source;
-
-    public function __construct(array $articles, string $source)
-    {
-        $this->articles = $articles;
-        $this->source = $source;
-    }
+    public function __construct(
+        private array $articles,
+        private string $source
+    ) {}
 
     public function handle(ArticleRepository $repository)
     {
-        $stats = [
-            'created' => 0,
-            'updated' => 0,
-            'failed' => 0
-        ];
+        try {
+            Log::info('Processing articles job started', [
+                'source' => $this->source,
+                'count' => count($this->articles)
+            ]);
 
-        foreach ($this->articles as $article) {
-            try {
-                $result = $repository->createOrUpdate($article, $this->source);
-                
-                if ($result->wasRecentlyCreated) {
-                    $stats['created']++;
-                    Log::info("Created new article: {$result->title}");
-                } else {
-                    $stats['updated']++;
-                    Log::info("Updated existing article: {$result->title}");
+            foreach ($this->articles as $article) {
+                try {
+                    $repository->createOrUpdate($article);
+                } catch (\Exception $e) {
+                    Log::error('Failed to process article', [
+                        'error' => $e->getMessage(),
+                        'article' => $article
+                    ]);
                 }
-            } catch (\Exception $e) {
-                $stats['failed']++;
-                Log::error("Failed to process article", [
-                    'source' => $this->source,
-                    'article' => $article,
-                    'error' => $e->getMessage()
-                ]);
             }
-        }
 
-        Log::info("Article processing completed", [
-            'source' => $this->source,
-            'stats' => $stats
-        ]);
+            Log::info('Processing articles job completed', [
+                'source' => $this->source
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error processing articles', [
+                'source' => $this->source,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
     }
 } 

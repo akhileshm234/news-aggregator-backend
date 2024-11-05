@@ -1,0 +1,44 @@
+version: "3"
+networks:
+    laravel:
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel-docker
+        restart: always
+        ports:
+            - 8000:80
+        volumes:
+            - .:/srv/app
+        environment:
+            REDIS_HOST: file
+            REDIS_PORT: 6379
+            SESSION_DRIVER: file
+            CACHE_DRIVER: redis
+        depends_on:
+            - mysql
+            - redis
+        networks:
+            - laravel
+    mysql:
+        image: mysql:latest
+        restart: always
+        ports:
+            - 3306:3306
+        environment:
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_USERNAME: akhileshm
+            DB_PASSWORD: E7649aksl
+            DB_DATABASE: laravel
+        networks:
+            - laravel
+    redis:
+        image: redis:5.0-alpine
+        restart: always
+        ports:
+            - 16379:6379
+        networks:
+            - laravel

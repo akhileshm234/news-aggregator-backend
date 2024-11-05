@@ -22,12 +22,12 @@ class UserPreferenceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'preferred_categories' => ['nullable', 'array'],
-            'preferred_categories.*' => ['string'],
-            'preferred_sources' => ['nullable', 'array'],
-            'preferred_sources.*' => ['string'],
-            'preferred_authors' => ['nullable', 'array'],
-            'preferred_authors.*' => ['string']
+            'preferred_categories' => 'nullable|array',
+            'preferred_categories.*' => 'string|max:50',
+            'preferred_sources' => 'nullable|array',
+            'preferred_sources.*' => 'string|max:50',
+            'preferred_authors' => 'nullable|array',
+            'preferred_authors.*' => 'string|max:50',
         ];
     }
 
@@ -39,12 +39,12 @@ class UserPreferenceRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'preferred_categories.array' => 'Categories must be an array',
-            'preferred_categories.*.string' => 'Each category must be a string',
-            'preferred_sources.array' => 'Sources must be an array',
-            'preferred_sources.*.string' => 'Each source must be a string',
-            'preferred_authors.array' => 'Authors must be an array',
-            'preferred_authors.*.string' => 'Each author must be a string'
+            'preferred_categories.array' => 'Preferred categories must be an array',
+            'preferred_categories.*.string' => 'Each preferred category must be a string',
+            'preferred_sources.array' => 'Preferred sources must be an array',
+            'preferred_sources.*.string' => 'Each preferred source must be a string',
+            'preferred_authors.array' => 'Preferred authors must be an array',
+            'preferred_authors.*.string' => 'Each preferred author must be a string',
         ];
     }
 } 

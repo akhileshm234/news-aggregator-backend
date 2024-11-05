@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel_app
+        restart: always
+        environment:
+            - APP_ENV=local
+            - APP_DEBUG=true
+            - APP_KEY=base64:463YufQ4LODjc6oF/1mb+Ine5qCa94XCXPb0yNaHu/U=
+            - DB_CONNECTION=mysql
+            - DB_HOST=mysql
+            - DB_PORT=mysql
+            - DB_DATABASE=laravel
+            - DB_USERNAME=akhileshm
+            - DB_PASSWORD=E7649aksl
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+        volumes:
+            - .:/var/www/html
+        ports:
+            - "8080:80"
+        depends_on:
+            - db
+            - redis
+    db:
+        image: mysql:8.0
+        container_name: mysql_db
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: E7649aksl
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: akhileshm
+            MYSQL_PASSWORD: E7649aksl
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+    redis:
+        image: redis:alpine
+        container_name: redis_server
+        restart: always
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+volumes:
+    mysql_data:
+    redis_data:

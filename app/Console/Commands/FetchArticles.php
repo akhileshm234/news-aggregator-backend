@@ -10,6 +10,7 @@ use App\Repositories\ArticleRepository;
 use App\Services\CacheService;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\ProcessNewArticles;
+use App\Models\Article;
 
 class FetchArticles extends Command
 {
@@ -82,35 +83,55 @@ class FetchArticles extends Command
         $this->info("Fetching articles from {$source}...");
 
         try {
-            // Get the appropriate service
             $service = $this->services[$source];
-
-            // Fetch articles
             $articles = $service->fetch();
 
-            // Transform articles to consistent format
-            $transformedArticles = $service->transform($articles);
+            $transformedArticles = array_map(function ($article) use ($source) {
+                $transformed = $this->services[$source]->transform($article);
+                $transformed['source_id'] = $this->getSourceId($article, $source);
+                $transformed['content_hash'] = md5($transformed['title'] . $transformed['content']);
+                return $transformed;
+            }, $articles);
 
-            // Dispatch job to process articles in the background
-            ProcessNewArticles::dispatch($transformedArticles, $source);
+            foreach ($transformedArticles as $article) {
+                try {
+                    Article::updateOrCreate(
+                        [
+                            'source_id' => $article['source_id'],
+                            'source' => $article['source']
+                        ],
+                        $article
+                    );
+                } catch (\Exception $e) {
+                    $this->error("Failed to insert article: {$e->getMessage()}");
+                    Log::error('Article insertion failed:', [
+                        'error' => $e->getMessage(),
+                        'article' => $article
+                    ]);
+                }
+            }
 
-            $this->info("Successfully queued " . count($transformedArticles) . " articles from {$source}");
+            $this->info("Processed " . count($transformedArticles) . " articles from {$source}");
 
         } catch (\Exception $e) {
-            $this->handleError($source, $e);
+            $this->error("Error processing {$source}: " . $e->getMessage());
         }
     }
 
-    protected function handleError(string $source, \Exception $e): void
+    protected function getSourceId($article, string $source): string
     {
-        $message = "Error fetching from {$source}: " . $e->getMessage();
-        
-        $this->error($message);
-        
-        Log::error($message, [
-            'source' => $source,
-            'exception' => $e,
-            'trace' => $e->getTraceAsString()
-        ]);
+        switch ($source) {
+            case 'newsapi':
+                return $article['source']['id'] ?? $article['id'] ?? uniqid('newsapi_');
+                
+            case 'guardian':
+                return $article['id'] ?? uniqid('guardian_');
+                
+            case 'nyt':
+                return $article['_id'] ?? uniqid('nyt_');
+                
+            default:
+                return uniqid($source . '_');
+        }
     }
 }

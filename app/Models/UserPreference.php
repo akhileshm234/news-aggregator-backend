@@ -17,8 +17,8 @@ class UserPreference extends Model
      */
     protected $fillable = [
         'user_id',
-        'preferred_categories',
         'preferred_sources',
+        'preferred_categories',
         'preferred_authors'
     ];
 
@@ -28,8 +28,8 @@ class UserPreference extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'preferred_categories' => 'array',
         'preferred_sources' => 'array',
+        'preferred_categories' => 'array',
         'preferred_authors' => 'array'
     ];
 

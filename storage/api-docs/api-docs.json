@@ -1,34 +1,34 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "News Aggregator API",
-        "description": "News Aggregator API Documentation",
+        "title": "News Aggregator API Documentation",
+        "description": "API documentation for News Aggregator Backend",
+        "contact": {
+            "email": "your-email@example.com"
+        },
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local API Server"
+        },
+        {
+            "url": "https://api.yourdomain.com",
+            "description": "Production API Server"
+        }
+    ],
     "paths": {
         "/api/articles": {
             "get": {
-                "tags": [
-                    "Articles"
-                ],
-                "summary": "Get paginated articles list with filters",
-                "description": "Get paginated list of articles.",
+                "tags": ["Articles"],
+                "summary": "Get paginated articles",
                 "operationId": "93ded9e31119e6bbb22455c72ef97f19",
                 "parameters": [
                     {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Application/json",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "application/json"
-                        }
-                    },
-                    {
                         "name": "keywords",
                         "in": "query",
-                        "description": "Search keywords in title and content",
+                        "description": "Search keywords",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -37,7 +37,7 @@
                     {
                         "name": "date_from",
                         "in": "query",
-                        "description": "Filter articles from date (Y-m-d)",
+                        "description": "Filter from date (Y-m-d)",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -47,11 +47,20 @@
                     {
                         "name": "date_to",
                         "in": "query",
-                        "description": "Filter articles to date (Y-m-d)",
+                        "description": "Filter to date (Y-m-d)",
                         "required": false,
                         "schema": {
                             "type": "string",
                             "format": "date"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by category",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     {
@@ -64,16 +73,6 @@
                         }
                     },
                     {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    },
-                    {
                         "name": "per_page",
                         "in": "query",
                         "description": "Items per page",
@@ -82,11 +81,21 @@
                             "type": "integer",
                             "default": 15
                         }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Current page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Success",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -94,7 +103,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/ArticleResource"
+                                                "$ref": "#/components/schemas/Article"
                                             }
                                         },
                                         "meta": {
@@ -123,61 +132,16 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation errors",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The given data was invalid"
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "example": {
-                                                "per_page": [
-                                                    "The per page must be between 1 and 100"
-                                                ],
-                                                "date_from": [
-                                                    "The date from must be a valid date"
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
+                }
             }
         },
         "/api/articles/{id}": {
             "get": {
-                "tags": [
-                    "Articles"
-                ],
-                "summary": "Get single article details",
-                "description": "Get single article details",
+                "tags": ["Articles"],
+                "summary": "Get specific article",
                 "operationId": "a85697b2464e9aaa3f9980a83edbef88",
                 "parameters": [
-                    {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Application/json",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "application/json"
-                        }
-                    },
                     {
                         "name": "id",
                         "in": "path",
@@ -190,16 +154,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Success",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/ArticleResource"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/Article"
                                 }
                             }
                         }
@@ -210,18 +169,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "error": {
-                                            "properties": {
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Article not found"
-                                                },
-                                                "status_code": {
-                                                    "type": "integer",
-                                                    "example": 404
-                                                }
-                                            },
-                                            "type": "object"
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resource not found"
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 404
                                         }
                                     },
                                     "type": "object"
@@ -229,46 +183,39 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
+                }
             }
         },
-        "/api/articles/personalized": {
+        "/api/personalized-feed": {
             "get": {
-                "tags": [
-                    "Articles"
-                ],
-                "summary": "Get personalized news feed",
-                "description": "Fetch articles based on user's preferred categories, sources, and authors",
-                "operationId": "b4ef29bf7f17394d8b99c324a0b68ad2",
+                "tags": ["Articles"],
+                "summary": "Get personalized news feed based on user preferences",
+                "operationId": "0cd119c7bb9fe5ae3d3bd07e1def92ab",
                 "parameters": [
-                    {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Application/json",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "application/json"
-                        }
-                    },
                     {
                         "name": "per_page",
                         "in": "query",
+                        "description": "Items per page",
                         "required": false,
                         "schema": {
                             "type": "integer",
                             "default": 15
                         }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Current page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Success",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -276,7 +223,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/ArticleResource"
+                                                "$ref": "#/components/schemas/Article"
                                             }
                                         },
                                         "meta": {
@@ -299,114 +246,6 @@
                                                 }
                                             },
                                             "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No articles found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "properties": {
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "No articles found"
-                                                },
-                                                "status_code": {
-                                                    "type": "integer",
-                                                    "example": 404
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/preferences": {
-            "get": {
-                "tags": [
-                    "User Preferences"
-                ],
-                "summary": "Get user preferences",
-                "description": "Retrieve the authenticated user's preferences for categories, sources, and authors",
-                "operationId": "021d0c2107826d4565c76cc774252f6c",
-                "parameters": [
-                    {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Application/json",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "application/json"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User preferences retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "user_id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "preferred_categories": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "technology"
-                                            },
-                                            "nullable": true
-                                        },
-                                        "preferred_sources": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "nyt"
-                                            },
-                                            "nullable": true
-                                        },
-                                        "preferred_authors": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "John Doe"
-                                            },
-                                            "nullable": true
-                                        },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "datetime",
-                                            "example": "2024-03-20T12:00:00Z"
-                                        },
-                                        "updated_at": {
-                                            "type": "string",
-                                            "format": "datetime",
-                                            "example": "2024-03-20T12:00:00Z"
                                         }
                                     },
                                     "type": "object"
@@ -420,43 +259,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "error": {
-                                            "properties": {
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Unauthenticated"
-                                                },
-                                                "status_code": {
-                                                    "type": "integer",
-                                                    "example": 401
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No preferences found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "properties": {
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "No preferences found"
-                                                },
-                                                "status_code": {
-                                                    "type": "integer",
-                                                    "example": 404
-                                                }
-                                            },
-                                            "type": "object"
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 401
                                         }
                                     },
                                     "type": "object"
@@ -467,62 +276,106 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/preferences": {
+            "get": {
+                "tags": ["User Preferences"],
+                "summary": "Get user preferences",
+                "operationId": "9d5a4e9bfa000aaafb6b6dc5ff600591",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "keywords": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
                 ]
             },
             "post": {
-                "tags": [
-                    "User Preferences"
-                ],
-                "summary": "Store or update user preferences",
-                "description": "Store or update user preferences",
+                "tags": ["User Preferences"],
+                "summary": "Update user preferences",
                 "operationId": "33d8da385e558d02665a52e49234849a",
-                "parameters": [
-                    {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Application/json",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "application/json"
-                        }
-                    }
-                ],
                 "requestBody": {
-                    "description": "User preference data",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
                                     "preferred_categories": {
-                                        "description": "Array of preferred categories",
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "example": "technology"
-                                        },
-                                        "nullable": true
+                                            "type": "string"
+                                        }
                                     },
                                     "preferred_sources": {
-                                        "description": "Array of preferred news sources",
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "example": "nyt"
-                                        },
-                                        "nullable": true
+                                            "type": "string"
+                                        }
                                     },
                                     "preferred_authors": {
-                                        "description": "Array of preferred authors",
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "example": "John Doe"
-                                        },
-                                        "nullable": true
+                                            "type": "string"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -537,47 +390,52 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "user_id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "preferred_categories": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "technology"
+                                        "data": {
+                                            "properties": {
+                                                "preferred_categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "preferred_sources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "preferred_authors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
                                             },
-                                            "nullable": true
+                                            "type": "object"
                                         },
-                                        "preferred_sources": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "nyt"
-                                            },
-                                            "nullable": true
-                                        },
-                                        "preferred_authors": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "John Doe"
-                                            },
-                                            "nullable": true
-                                        },
-                                        "created_at": {
+                                        "message": {
                                             "type": "string",
-                                            "format": "datetime",
-                                            "example": "2024-03-20T12:00:00Z"
-                                        },
-                                        "updated_at": {
+                                            "example": "Preferences updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
                                             "type": "string",
-                                            "format": "datetime",
-                                            "example": "2024-03-20T12:00:00Z"
+                                            "example": "Unauthenticated"
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 401
                                         }
                                     },
                                     "type": "object"
@@ -586,39 +444,175 @@
                         }
                     },
                     "422": {
-                        "description": "Validation errors"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "preferred_categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The preferred categories must be an array."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
+        "/api/login": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Login user",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "description": "User credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": ["email", "password"],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged in"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|laravel_sanctum_token..."
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The provided credentials are incorrect."
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The email field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/register": {
             "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Register a new user",
+                "tags": ["Authentication"],
+                "summary": "Register new user",
                 "operationId": "8a56853624e025573120a09a4c75d468",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "Akhilesh M"
+                                        "example": "John Doe"
                                     },
                                     "email": {
                                         "type": "string",
-                                        "example": "akhileshm@example.com"
+                                        "format": "email",
+                                        "example": "user@example.com"
                                     },
                                     "password": {
                                         "type": "string",
+                                        "format": "password",
                                         "example": "password123"
                                     },
                                     "password_confirmation": {
@@ -632,17 +626,31 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "User registered successfully",
+                    "200": {
+                        "description": "Registration successful",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
+                                        "token": {
                                             "type": "string",
-                                            "example": "User registered successfully"
+                                            "example": "1|abcdef123456"
                                         },
                                         "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -662,105 +670,15 @@
                                             "example": "The given data was invalid."
                                         },
                                         "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
                                             "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/login": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Login user",
-                "operationId": "login",
-                "requestBody": {
-                    "description": "User credentials",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "email",
-                                    "password"
-                                ],
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "akhileshm@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "password123"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successfully logged in",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Successfully logged in"
-                                        },
-                                        "token": {
-                                            "type": "string",
-                                            "example": "1|laravel_sanctum_token..."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Invalid credentials"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation errors",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The given data was invalid"
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "example": {
-                                                "email": [
-                                                    "The email field is required"
-                                                ]
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -773,15 +691,12 @@
         },
         "/api/logout": {
             "post": {
-                "tags": [
-                    "Auth"
-                ],
+                "tags": ["Authentication"],
                 "summary": "Logout user",
-                "description": "Logout the current user.",
                 "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
                 "responses": {
                     "200": {
-                        "description": "Successfully logged out",
+                        "description": "Logout successful",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -789,10 +704,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Successfully logged out"
-                                        },
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
                                         }
                                     },
                                     "type": "object"
@@ -809,10 +720,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Unauthenticated"
-                                        },
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
                                         }
                                     },
                                     "type": "object"
@@ -823,16 +730,14 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
         "/api/forgot-password": {
             "post": {
-                "tags": [
-                    "Auth"
-                ],
+                "tags": ["Authentication"],
                 "summary": "Send password reset link",
                 "operationId": "7af8817e88ba5874543ff38f188248f1",
                 "requestBody": {
@@ -893,9 +798,7 @@
         },
         "/api/reset-password": {
             "post": {
-                "tags": [
-                    "Auth"
-                ],
+                "tags": ["Authentication"],
                 "summary": "Reset password",
                 "operationId": "00c0aad74830221c6da409a1355ec736",
                 "requestBody": {
@@ -1025,29 +928,166 @@
                     }
                 },
                 "type": "object"
+            },
+            "Article": {
+                "title": "Article",
+                "description": "Article model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Article Title"
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Article content..."
+                    },
+                    "summary": {
+                        "type": "string",
+                        "example": "A brief summary of the article..."
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com/article"
+                    },
+                    "source": {
+                        "type": "string",
+                        "example": "news_source"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "technology"
+                    },
+                    "author": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "example": "https://example.com/image.jpg"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "reading_time": {
+                        "type": "integer",
+                        "example": 5
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Article"
+                }
+            },
+            "User": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "User"
+                }
+            },
+            "AuthResource": {
+                "title": "AuthResource",
+                "description": "Auth response resource",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "example": "1|abcdef123456"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "AuthResource"
+                }
+            },
+            "ErrorResource": {
+                "title": "ErrorResource",
+                "description": "Error response resource",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "status_code": {
+                        "type": "integer",
+                        "example": 422
+                    },
+                    "errors": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "ErrorResource"
+                }
             }
         },
         "securitySchemes": {
-            "sanctum": {
-                "type": "apiKey",
-                "description": "Enter token in format (Bearer <token>)",
-                "name": "Authorization",
-                "in": "header"
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     },
     "tags": [
         {
             "name": "Articles",
-            "description": "Articles"
+            "description": "API Endpoints for articles"
         },
         {
             "name": "User Preferences",
-            "description": "User Preferences"
+            "description": "API Endpoints for user preferences"
         },
         {
-            "name": "Auth",
-            "description": "Auth"
+            "name": "Authentication",
+            "description": "API Endpoints for user authentication"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
         }
     ]
 }

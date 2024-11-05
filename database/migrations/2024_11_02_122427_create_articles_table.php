@@ -14,11 +14,12 @@ class CreateArticlesTable extends Migration
             $table->string('source');
             $table->string('title');
             $table->text('content')->nullable();
-            $table->string('url');
+            $table->text('url');
             $table->timestamp('published_at');
             $table->string('author')->nullable();
-            $table->string('image_url')->nullable();
-            $table->string('content_hash')->index(); // Add this line
+            $table->text('image_url')->nullable();
+            $table->string('content_hash')->default('')->index(); // Add this line
+            $table->string('category')->nullable(); // Add this line for category
             $table->timestamps();
     
             // Composite indexes

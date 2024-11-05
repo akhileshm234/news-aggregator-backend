@@ -19,6 +19,7 @@ class Article extends Model
         'published_at',
         'author',
         'image_url',
+        'category',
         'content_hash'
     ];
 
@@ -43,14 +44,10 @@ class Article extends Model
             ->get();
     }
 
-    public function getSummary(int $length = 200): string
-    {
-        return Str::limit(strip_tags($this->content), $length);
-    }
-
     public function getReadingTime(): int
     {
         $wordCount = str_word_count(strip_tags($this->content));
-        return (int) ceil($wordCount / 200); // Average reading speed: 200 words/minute
+        $minutesToRead = ceil($wordCount / 200);
+        return max(1, $minutesToRead);
     }
 }
