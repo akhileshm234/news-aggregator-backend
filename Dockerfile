@@ -1,6 +1,6 @@
-FROM php:8.1-cli
+FROM php:8.2-cli
 
-WORKDIR /var/www/html
+WORKDIR /opt
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -9,17 +9,22 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    libzip-dev    
+    libzip-dev 
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-COPY . .
+COPY . /opt
 
-RUN composer update
+# Install composer dependencies
+RUN composer install
 
+# Generate application key after dependencies are installed
 RUN php artisan key:generate
+
+RUN chown -R www-data:www-data /opt
+
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["php", "artisan", "serve"]

@@ -21,7 +21,9 @@
     "paths": {
         "/api/articles": {
             "get": {
-                "tags": ["Articles"],
+                "tags": [
+                    "Articles"
+                ],
                 "summary": "Get paginated articles",
                 "operationId": "93ded9e31119e6bbb22455c72ef97f19",
                 "parameters": [
@@ -138,7 +140,9 @@
         },
         "/api/articles/{id}": {
             "get": {
-                "tags": ["Articles"],
+                "tags": [
+                    "Articles"
+                ],
                 "summary": "Get specific article",
                 "operationId": "a85697b2464e9aaa3f9980a83edbef88",
                 "parameters": [
@@ -188,7 +192,9 @@
         },
         "/api/personalized-feed": {
             "get": {
-                "tags": ["Articles"],
+                "tags": [
+                    "Articles"
+                ],
                 "summary": "Get personalized news feed based on user preferences",
                 "operationId": "0cd119c7bb9fe5ae3d3bd07e1def92ab",
                 "parameters": [
@@ -283,7 +289,9 @@
         },
         "/api/preferences": {
             "get": {
-                "tags": ["User Preferences"],
+                "tags": [
+                    "User Preferences"
+                ],
                 "summary": "Get user preferences",
                 "operationId": "9d5a4e9bfa000aaafb6b6dc5ff600591",
                 "responses": {
@@ -350,7 +358,9 @@
                 ]
             },
             "post": {
-                "tags": ["User Preferences"],
+                "tags": [
+                    "User Preferences"
+                ],
                 "summary": "Update user preferences",
                 "operationId": "33d8da385e558d02665a52e49234849a",
                 "requestBody": {
@@ -481,7 +491,9 @@
         },
         "/api/login": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Login user",
                 "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
                 "requestBody": {
@@ -490,7 +502,10 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": ["email", "password"],
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
                                 "properties": {
                                     "email": {
                                         "type": "string",
@@ -586,7 +601,9 @@
         },
         "/api/register": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Register new user",
                 "operationId": "8a56853624e025573120a09a4c75d468",
                 "requestBody": {
@@ -691,7 +708,9 @@
         },
         "/api/logout": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Logout user",
                 "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
                 "responses": {
@@ -737,7 +756,9 @@
         },
         "/api/forgot-password": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Send password reset link",
                 "operationId": "7af8817e88ba5874543ff38f188248f1",
                 "requestBody": {
@@ -798,7 +819,9 @@
         },
         "/api/reset-password": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Reset password",
                 "operationId": "00c0aad74830221c6da409a1355ec736",
                 "requestBody": {
