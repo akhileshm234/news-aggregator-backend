@@ -68,7 +68,7 @@ MAIL_FROM_ADDRESS: your_email@gmail.com
 4. Start the application (this will automatically install dependencies, run migrations, and fetch articles):
 
 ```bash
-docker-compose up -d
+docker-compose up
 ```
 
 The application will be available at `http://localhost:8000`
