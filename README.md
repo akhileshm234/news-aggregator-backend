@@ -223,3 +223,28 @@ This automated process ensures that:
 -   The API server is started and accessible on port 8000
 
 > **Note**: You don't need to run these commands manually - they're all handled automatically by Docker.
+
+### Fetching Articles
+
+The application can fetch articles from three sources: NewsAPI, The Guardian, and New York Times.
+
+To fetch articles from all sources:
+
+```bash
+docker-compose exec app php artisan app:fetch-articles
+```
+
+To fetch articles from specific sources:
+
+```bash
+# Fetch from NewsAPI only
+docker-compose exec app php artisan app:fetch-articles --source=newsapi
+
+# Fetch from The Guardian only
+docker-compose exec app php artisan app:fetch-articles --source=guardian
+
+# Fetch from New York Times only
+docker-compose exec app php artisan app:fetch-articles --source=nyt
+```
+
+> **Note**: The fetch command is automatically run during container startup, but you can use these commands to manually refresh articles from specific sources.
