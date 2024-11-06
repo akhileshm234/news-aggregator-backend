@@ -43,8 +43,8 @@ A powerful RESTful API built with Laravel that aggregates news from multiple sou
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/akhileshm234/news-aggregator-backend.git
-cd news-aggregator-backend
+git clone https://github.com/yourusername/news-aggregator-api.git
+cd news-aggregator-api
 ```
 
 2. Copy the docker-compose configuration file:
@@ -53,23 +53,13 @@ cd news-aggregator-backend
 cp docker-compose.example.yml docker-compose.yml
 ```
 
-3. (Optional) Update email credentials in docker-compose.yml if you want to test password reset functionality:
-
-```yaml
-MAIL_MAILER: smtp
-MAIL_HOST: smtp.gmail.com
-MAIL_PORT: 587
-MAIL_USERNAME: your_email@gmail.com
-MAIL_PASSWORD: your_app_password
-MAIL_ENCRYPTION: null
-MAIL_FROM_ADDRESS: your_email@gmail.com
-```
-
-4. Start the application (this will automatically install dependencies, run migrations, and fetch articles):
+3. Start the application:
 
 ```bash
 docker-compose up
 ```
+
+> **Note**: The application key is pre-configured in the docker-compose file, so no additional key generation is required.
 
 The application will be available at `http://localhost:8000`
 
@@ -201,16 +191,13 @@ composer install
 # 2. Cache configuration
 php artisan config:cache
 
-# 3. Generate application key
-php artisan key:generate
-
-# 4. Run database migrations
+# 3. Run database migrations
 php artisan migrate --force
 
-# 5. Fetch initial articles from news sources
+# 4. Fetch initial articles from news sources
 php artisan app:fetch-articles
 
-# 6. Start Laravel development server
+# 5. Start Laravel development server
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
