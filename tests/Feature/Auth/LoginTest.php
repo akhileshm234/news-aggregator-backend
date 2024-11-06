@@ -16,15 +16,29 @@ class LoginTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $response = $this->postJson('/api/login', [
+        $response = $this->postJson('/api/user/login', [
             'email' => $user->email,
             'password' => 'password123',
         ]);
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'message',
-                'token',
+                'status',
+                'data' => [
+                    'message',
+                    'token',
+                    'user' => [
+                        'id',
+                        'name',
+                        'email'
+                    ]
+                ]
+            ])
+            ->assertJson([
+                'status' => 'success',
+                'data' => [
+                    'message' => 'Successfully logged in'
+                ]
             ]);
     }
 
@@ -32,20 +46,22 @@ class LoginTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->postJson('/api/login', [
+        $response = $this->postJson('/api/user/login', [
             'email' => $user->email,
             'password' => 'wrongpassword',
         ]);
 
         $response->assertStatus(401)
             ->assertJson([
-                'message' => 'Invalid credentials'
+                'status' => 'error',
+                'message' => 'Invalid credentials',
+                'status_code' => 401
             ]);
     }
 
     public function test_login_validates_required_fields()
     {
-        $response = $this->postJson('/api/login', []);
+        $response = $this->postJson('/api/user/login', []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email', 'password']);
