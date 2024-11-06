@@ -6,6 +6,8 @@ return [
         'default' => [
             'api' => [
                 'title' => 'News Aggregator API Documentation',
+                'version' => '1.0.0',
+                'description' => 'API documentation for News Aggregator',
             ],
             'routes' => [
                 'api' => 'api/documentation',
@@ -18,6 +20,8 @@ return [
                 'annotations' => [
                     base_path('app'),
                 ],
+                'base' => env('L5_SWAGGER_BASE_PATH', null),
+                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),
             ],
         ],
     ],
@@ -58,7 +62,7 @@ return [
                 ['bearerAuth' => []],
             ],
         ],
-        'generate_always' => env('L5_SWAGGER_GENERATE_ALWAYS', false),
+        'generate_always' => env('L5_SWAGGER_GENERATE_ALWAYS', true),
         'generate_yaml_copy' => env('L5_SWAGGER_GENERATE_YAML_COPY', false),
         'proxy' => false,
         'additional_config_url' => null,

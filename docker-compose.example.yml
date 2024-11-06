@@ -1,44 +1,84 @@
-version: "3"
-networks:
-    laravel:
 services:
-    app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        image: laravel-docker
-        restart: always
-        ports:
-            - 8000:80
-        volumes:
-            - .:/srv/app
-        environment:
-            REDIS_HOST: file
-            REDIS_PORT: 6379
-            SESSION_DRIVER: file
-            CACHE_DRIVER: redis
-        depends_on:
-            - mysql
-            - redis
-        networks:
-            - laravel
-    mysql:
-        image: mysql:latest
-        restart: always
-        ports:
-            - 3306:3306
-        environment:
-            DB_HOST: mysql
-            DB_PORT: 3306
-            DB_USERNAME: akhileshm
-            DB_PASSWORD: E7649aksl
-            DB_DATABASE: laravel
-        networks:
-            - laravel
-    redis:
-        image: redis:5.0-alpine
-        restart: always
-        ports:
-            - 16379:6379
-        networks:
-            - laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: always
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost
+      APP_KEY: base64:463YufQ4LODjc6oF/1mb+Ine5qCa94XCXPb0yNaHu/U=
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: laravel
+      DB_USERNAME: root
+      DB_PASSWORD: E7649aksl
+      BROADCAST_DRIVER: log
+      CACHE_DRIVER: redis
+      FILESYSTEM_DISK: local
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: redis
+      SESSION_LIFETIME: 120
+      REDIS_HOST: redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: 6379
+      MAIL_MAILER: smtp
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: your_email@gmail.com
+      MAIL_PASSWORD: your_app_password
+      MAIL_ENCRYPTION: null
+      MAIL_FROM_ADDRESS: your_email@gmail.com
+      MAIL_FROM_NAME: from_name
+      FRONTEND_URL: http://localhost:3000
+      NEWSAPI_KEY: 3a22527133a54571b26078cc9a1ba5ba
+      GUARDIAN_API_KEY: test
+      NYT_API_KEY: ACzGu9QKVwxCKIOnAGMPOrsm8kUcl374
+      L5_SWAGGER_GENERATE_ALWAYS: "true"
+      L5_SWAGGER_BASE_PATH: /api
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - laravel_network
+    command: sh -c "composer install && php artisan config:cache && php artisan key:generate && php artisan migrate --force && php artisan app:fetch-articles && php artisan serve --host=0.0.0.0 --port=8000"
+
+  db:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: E7649aksl
+      MYSQL_DATABASE: laravel
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - laravel_network
+
+  redis:
+    image: redis:alpine
+    container_name: redis_server
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - laravel_network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  laravel_network:
+    driver: bridge

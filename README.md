@@ -1,66 +1,234 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# News Aggregator API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A powerful RESTful API built with Laravel that aggregates news from multiple sources, providing a personalized news feed experience. The system pulls articles from various news APIs, stores them efficiently, and offers advanced search and filtering capabilities.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### User Authentication
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   User registration and login with Laravel Sanctum
+-   Secure password reset functionality
+-   Token-based authentication for API access
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Article Management
 
-## Learning Laravel
+-   Paginated article listings
+-   Advanced search and filtering (keyword, date, category, source)
+-   Detailed single article view
+-   Efficient data storage and indexing
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### User Preferences
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+-   Customizable news sources
+-   Category preferences
+-   Favorite authors
+-   Personalized news feed based on user preferences
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Data Aggregation
 
-## Laravel Sponsors
+-   Automated article fetching from multiple news sources
+-   Regular updates via scheduled commands
+-   Local data storage for optimal performance
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Setup Instructions
 
-### Premium Partners
+### Prerequisites
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+-   Docker
+-   Docker Compose
+-   Git
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/akhileshm234/news-aggregator-backend.git
+cd news-aggregator-backend
+```
+
+2. Copy the docker-compose configuration file:
+
+```bash
+cp docker-compose.example.yml docker-compose.yml
+```
+
+3. (Optional) Update email credentials in docker-compose.yml if you want to test password reset functionality:
+
+```yaml
+MAIL_MAILER: smtp
+MAIL_HOST: smtp.gmail.com
+MAIL_PORT: 587
+MAIL_USERNAME: your_email@gmail.com
+MAIL_PASSWORD: your_app_password
+MAIL_ENCRYPTION: null
+MAIL_FROM_ADDRESS: your_email@gmail.com
+```
+
+4. Start the application (this will automatically install dependencies, run migrations, and fetch articles):
+
+```bash
+docker-compose up -d
+```
+
+The application will be available at `http://localhost:8000`
+
+### (Optional) Create Default User
+
+If you want to create a default user, run:
+
+```bash
+docker-compose exec app php artisan db:seed --class=UsersTableSeeder
+```
+
+Alternatively, you can register a new user through the `/api/register` endpoint.
+
+### API Keys
+
+The docker-compose.yml file already includes working API keys for:
+
+-   NewsAPI
+-   The Guardian
+-   New York Times
+
+No additional configuration is required for the news sources.
+
+### Running Tests
+
+```bash
+docker-compose exec app php artisan test
+```
+
+## API Documentation
+
+Access the API documentation at:
+
+-   Local: `http://localhost:8000/api/documentation`
+-   Production: `https://your-domain.com/api/documentation`
+
+## Additional Notes
+
+### News Sources
+
+The system currently integrates with the following news APIs:
+
+-   NewsAPI
+-   The Guardian
+-   New York Times
+
+### Caching Strategy
+
+-   Article data is cached for 15 minutes
+-   User preferences are cached until modified
+-   Search results are cached based on query parameters
+
+### Rate Limiting
+
+-   API endpoints are rate-limited to 60 requests per minute per user
+-   Unauthenticated endpoints are limited to 30 requests per minute
+
+### Security Measures
+
+-   API authentication using Laravel Sanctum
+-   Input validation and sanitization
+-   Protection against SQL injection and XSS attacks
+-   CORS configuration for frontend integration
+
+### Database Credentials
+
+The application comes with pre-configured database settings in docker-compose.yml:
+
+```yaml
+DB_HOST: mysql
+DB_PORT: 3306
+DB_USERNAME: akhileshm
+DB_PASSWORD: E7649aksl
+DB_DATABASE: laravel
+```
+
+These credentials are automatically configured when you run `docker-compose up`. No additional database setup is required as the MySQL container will be created with these credentials.
+
+> **Note**: In a production environment, you should change these credentials to more secure values.
+
+### System Configuration
+
+The application uses several services for optimal performance:
+
+#### Redis Configuration
+
+Redis is used for session management and caching:
+
+```yaml
+SESSION_DRIVER: redis
+REDIS_HOST: redis
+REDIS_PORT: 6379
+REDIS_PASSWORD: null
+```
+
+Redis is automatically configured when running with Docker.
+
+#### Queue Configuration
+
+The application uses database queue driver for background jobs:
+
+```yaml
+QUEUE_CONNECTION: database
+```
+
+Background jobs include:
+
+-   Fetching articles from news sources
+-   Sending password reset emails
+-   Processing user preferences
+
+#### File Storage
+
+Local file system is used for storage:
+
+```yaml
+FILESYSTEM_DISK: local
+```
+
+All these services are automatically configured and started when running `docker-compose up`. No additional setup is required.
+
+### Automatic Setup Process
+
+When you run `docker-compose up`, the following commands are automatically executed in sequence:
+
+```bash
+# 1. Install PHP dependencies
+composer install
+
+# 2. Cache configuration
+php artisan config:cache
+
+# 3. Generate application key
+php artisan key:generate
+
+# 4. Run database migrations
+php artisan migrate --force
+
+# 5. Fetch initial articles from news sources
+php artisan app:fetch-articles
+
+# 6. Start Laravel development server
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+This automated process ensures that:
+
+-   All dependencies are properly installed
+-   The application is correctly configured
+-   The database is structured
+-   Initial news articles are fetched
+-   The API server is started and accessible on port 8000
+
+> **Note**: You don't need to run these commands manually - they're all handled automatically by Docker.
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details

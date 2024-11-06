@@ -13,18 +13,13 @@ use Illuminate\Routing\Controller as BaseController;
  *     title="News Aggregator API Documentation",
  *     description="API documentation for News Aggregator Backend",
  *     @OA\Contact(
- *         email="your-email@example.com"
+ *         email="akhileshm234@gmail.com"
  *     )
  * )
  * 
  * @OA\Server(
  *     url="http://localhost:8000",
  *     description="Local API Server"
- * )
- * 
- * @OA\Server(
- *     url="https://api.yourdomain.com",
- *     description="Production API Server"
  * )
  * 
  * @OA\SecurityScheme(

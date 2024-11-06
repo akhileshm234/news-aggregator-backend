@@ -27,9 +27,11 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/login",
+     *     path="/api/user/login",
+     *     operationId="loginUser",
      *     tags={"Authentication"},
-     *     summary="Login user",
+     *     summary="User login",
+     *     description="Login user and return token",
      *     @OA\RequestBody(
      *         required=true,
      *         description="User credentials",
@@ -41,35 +43,44 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="OK",
+     *         description="Successful login",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Successfully logged in"),
-     *             @OA\Property(property="token", type="string", example="1|laravel_sanctum_token..."),
-     *             @OA\Property(property="status_code", type="integer", example=200)
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="string",
+     *                 example="success"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string",
+     *                     example="Successfully logged in"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="token",
+     *                     type="string",
+     *                     example="1|laravel_sanctum_token..."
+     *                 ),
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", example="user@example.com")
+     *                 ),
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=401,
-     *         description="Unauthorized",
+     *         description="Invalid credentials",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="The provided credentials are incorrect."),
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Invalid credentials"),
      *             @OA\Property(property="status_code", type="integer", example=401)
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="email",
-     *                     type="array",
-     *                     @OA\Items(type="string", example="The email field is required.")
-     *                 )
-     *             )
      *         )
      *     )
      * )
@@ -80,16 +91,26 @@ class AuthController extends Controller
 
         if (!auth()->attempt($credentials)) {
             return response()->json([
-                'message' => 'Invalid credentials'
+                'status' => 'error',
+                'message' => 'Invalid credentials',
+                'status_code' => 401
             ], 401);
         }
 
-        $token = auth()->user()->createToken('auth-token')->plainTextToken;
+        $user = auth()->user();
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Successfully logged in',
-            'token' => $token,  // Ensure this matches your Swagger definition
-            'status_code' => 200 // Also return the status code
+            'status' => 'success',
+            'data' => [
+                'message' => 'Successfully logged in',
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email
+                ],
+            ]
         ], 200);
     }
 

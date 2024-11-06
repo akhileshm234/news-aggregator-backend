@@ -13,7 +13,7 @@ class CreateArticlesTable extends Migration
             $table->string('source_id');
             $table->string('source');
             $table->string('title');
-            $table->text('content')->nullable();
+            $table->longText('content')->nullable();
             $table->text('url');
             $table->timestamp('published_at');
             $table->string('author')->nullable();

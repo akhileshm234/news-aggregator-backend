@@ -8,6 +8,7 @@ services:
         environment:
             APP_ENV: local
             APP_DEBUG: "true"
+            APP_URL: http://localhost
             APP_KEY: base64:463YufQ4LODjc6oF/1mb+Ine5qCa94XCXPb0yNaHu/U=
             DB_CONNECTION: mysql
             DB_HOST: db
@@ -15,10 +16,31 @@ services:
             DB_DATABASE: laravel
             DB_USERNAME: root
             DB_PASSWORD: E7649aksl
+            BROADCAST_DRIVER: log
+            CACHE_DRIVER: redis
+            FILESYSTEM_DISK: local
+            QUEUE_CONNECTION: database
+            SESSION_DRIVER: redis
+            SESSION_LIFETIME: 120
             REDIS_HOST: redis
+            REDIS_PASSWORD: null
             REDIS_PORT: 6379
+            MAIL_MAILER: smtp
+            MAIL_HOST: smtp.gmail.com
+            MAIL_PORT: 587
+            MAIL_USERNAME: testac8547@gmail.com
+            MAIL_PASSWORD: aznddotlmjtpytun
+            MAIL_ENCRYPTION: null
+            MAIL_FROM_ADDRESS: mjrkeerthan@gmail.com
+            MAIL_FROM_NAME: "${APP_NAME}"
+            FRONTEND_URL: http://localhost:3000
+            NEWSAPI_KEY: 3a22527133a54571b26078cc9a1ba5ba
+            GUARDIAN_API_KEY: test
+            NYT_API_KEY: ACzGu9QKVwxCKIOnAGMPOrsm8kUcl374
+            L5_SWAGGER_GENERATE_ALWAYS: "true"
+            L5_SWAGGER_BASE_PATH: /api
         volumes:
-            - .:/opt
+            - .:/var/www/html
         ports:
             - "8000:8000"
         depends_on:
@@ -26,6 +48,7 @@ services:
             - redis
         networks:
             - laravel_network
+        command: sh -c "composer install && php artisan config:cache && php artisan key:generate && php artisan migrate --force && php artisan app:fetch-articles && php artisan serve --host=0.0.0.0 --port=8000"
 
     db:
         image: mysql:8
@@ -35,7 +58,7 @@ services:
             MYSQL_ROOT_PASSWORD: E7649aksl
             MYSQL_DATABASE: laravel
         ports:
-            - "3307:3306" # Ensure this is correct as needed
+            - "3306:3306"
         volumes:
             - mysql_data:/var/lib/mysql
         networks:
