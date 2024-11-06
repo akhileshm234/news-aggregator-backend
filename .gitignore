@@ -11,7 +11,7 @@
 .phpunit.result.cache
 
 # Docker specific
-
+docker-compose.yml
 
 # IDE specific
 /.idea
