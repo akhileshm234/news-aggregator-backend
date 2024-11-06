@@ -59,9 +59,14 @@ cp docker-compose.example.yml docker-compose.yml
 docker-compose up
 ```
 
-> **Note**: The application key is pre-configured in the docker-compose file, so no additional key generation is required.
+After successful startup, you'll see a message with the URL: `http://localhost:8000`
 
-The application will be available at `http://localhost:8000`
+### Accessing the Application
+
+The following URLs will be available:
+
+-   API Endpoints: `http://localhost:8000/api`
+-   API Documentation: `http://localhost:8000/api/documentation`
 
 ### (Optional) Create Default User
 
