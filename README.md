@@ -43,8 +43,8 @@ A powerful RESTful API built with Laravel that aggregates news from multiple sou
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/news-aggregator-api.git
-cd news-aggregator-api
+git clone https://github.com/akhileshm234/news-aggregator-backend.git
+cd news-aggregator-backend
 ```
 
 2. Copy the docker-compose configuration file:
