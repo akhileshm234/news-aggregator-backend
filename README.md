@@ -104,7 +104,6 @@ docker-compose exec app php artisan test
 Access the API documentation at:
 
 -   Local: `http://localhost:8000/api/documentation`
--   Production: `https://your-domain.com/api/documentation`
 
 ## Additional Notes
 
@@ -224,11 +223,3 @@ This automated process ensures that:
 -   The API server is started and accessible on port 8000
 
 > **Note**: You don't need to run these commands manually - they're all handled automatically by Docker.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
